@@ -1,50 +1,76 @@
-async function loadContacts() {
-    const status = document.getElementById("status");
-    try {
-        // We use the exact path that worked in your browser
-        const res = await fetch("/api/admin/contacts"); 
-        
-        if (!res.ok) throw new Error("Server returned 404 or 500");
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Dashboard</title>
+<style>
+body{font-family:Arial;background:#f5f5f5;padding:30px}
+h1{color:#2c3e50}
+table{width:100%;border-collapse:collapse;margin-bottom:40px}
+th,td{border:1px solid #ccc;padding:10px;text-align:left}
+th{background:#2c3e50;color:white}
+</style>
+</head>
 
-        const data = await res.json();
-        const table = document.getElementById("contactsTable");
+<body>
 
-        // Success! Clear the error message
-        if (status) status.innerText = "";
+<h1>Admin Dashboard</h1>
 
-        data.forEach(c => {
-            const row = table.insertRow();
-            row.insertCell(0).innerText = c.name || "N/A";
-            row.insertCell(1).innerText = c.email || "N/A";
-            row.insertCell(2).innerText = c.message || "N/A";
-        });
-    } catch (err) {
-        console.error("Fetch error:", err);
-        if (status) status.innerText = "Server not running (Check F12)";
-    }
+<h2>Contact Messages</h2>
+<table id="contactsTable">
+<tr>
+<th>Name</th>
+<th>Email</th>
+<th>Message</th>
+</tr>
+</table>
+
+<h2>Donations</h2>
+<table id="donationsTable">
+<tr>
+<th>Name</th>
+<th>Email</th>
+<th>Amount</th>
+<th>Message</th>
+</tr>
+</table>
+
+<script>
+
+async function loadContacts(){
+
+const res = await fetch("/api/admin/contacts");
+const data = await res.json();
+
+const table = document.getElementById("contactsTable");
+
+data.forEach(c=>{
+const row = table.insertRow();
+row.insertCell(0).innerText=c.name;
+row.insertCell(1).innerText=c.email;
+row.insertCell(2).innerText=c.message;
+});
 }
 
-async function loadDonations() {
-    try {
-        // FIXED: No more 127.0.0.1. Using relative path.
-        const res = await fetch("/api/admin/donations");
-        if (!res.ok) return; // Silent fail if donations don't exist yet
+async function loadDonations(){
 
-        const data = await res.json();
-        const table = document.getElementById("donationsTable");
+const res = await fetch("http://127.0.0.1:5000/api/admin/donations");
+const data = await res.json();
 
-        data.forEach(d => {
-            const row = table.insertRow();
-            row.insertCell(0).innerText = d.name || "N/A";
-            row.insertCell(1).innerText = d.email || "N/A";
-            row.insertCell(2).innerText = d.amount || "0";
-            row.insertCell(3).innerText = d.message || "N/A";
-        });
-    } catch (err) {
-        console.log("Donations not found or empty.");
-    }
+const table = document.getElementById("donationsTable");
+
+data.forEach(d=>{
+const row = table.insertRow();
+row.insertCell(0).innerText=d.name;
+row.insertCell(1).innerText=d.email;
+row.insertCell(2).innerText=d.amount;
+row.insertCell(3).innerText=d.message;
+});
 }
 
-// Start the loading process
 loadContacts();
 loadDonations();
+
+</script>
+
+</body>
+</html>
