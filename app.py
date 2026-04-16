@@ -70,10 +70,17 @@ def login():
 
 # Admin route to get contacts
 @app.route('/api/admin/contacts', methods=['GET', 'POST'])
-def get_contacts():
-    
-    contacts = list(contacts_collection.find({}, {"_id": 0}))
-    return jsonify(contacts)
+def get_admin_contacts():
+    try:
+        contacts = list(contacts_collection.find())
+        for contact in contacts:
+            contact["_id"] = str(contact["_id"])
+        
+        # Ensure you are using jsonify
+        return jsonify(contacts) 
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify([]), 500 # Return empty list on error
 
 
 # Admin route to get donations
