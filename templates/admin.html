@@ -38,7 +38,7 @@ th{background:#2c3e50;color:white}
 
 async function loadContacts(){
 
-const res = await fetch("http://127.0.0.1:5000/api/admin/contacts");
+const res = await fetch("/api/admin/contacts");
 const data = await res.json();
 
 const table = document.getElementById("contactsTable");
