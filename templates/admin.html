@@ -1,96 +1,50 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Admin Dashboard</title>
-    <style>
-        body{font-family:Arial;background:#f5f5f5;padding:30px}
-        h1{color:#2c3e50}
-        table{width:100%;border-collapse:collapse;margin-bottom:40px}
-        th,td{border:1px solid #ccc;padding:10px;text-align:left}
-        th{background:#2c3e50;color:white}
-        .error-log { color: red; font-weight: bold; }
-    </style>
-</head>
-<body>
-
-<h1>Admin Dashboard</h1>
-<div id="status" class="error-log"></div>
-
-<h2>Contact Messages</h2>
-<table id="contactsTable">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Message</th>
-        </tr>
-    </thead>
-    <tbody id="contactsBody"></tbody>
-</table>
-
-<h2>Donations</h2>
-<table id="donationsTable">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Amount</th>
-            <th>Message</th>
-        </tr>
-    </thead>
-    <tbody id="donationsBody"></tbody>
-</table>
-
-<script>
 async function loadContacts() {
+    const status = document.getElementById("status");
     try {
-        // FIXED: Removed the local IP. Using relative path for Render.
-        const res = await fetch("/api/admin/contacts");
-        if (!res.ok) throw new Error("Contacts fetch failed with status " + res.status);
+        // We use the exact path that worked in your browser
+        const res = await fetch("/api/admin/contacts"); 
         
+        if (!res.ok) throw new Error("Server returned 404 or 500");
+
         const data = await res.json();
-        const tbody = document.getElementById("contactsBody");
+        const table = document.getElementById("contactsTable");
+
+        // Success! Clear the error message
+        if (status) status.innerText = "";
 
         data.forEach(c => {
-            const row = tbody.insertRow();
+            const row = table.insertRow();
             row.insertCell(0).innerText = c.name || "N/A";
             row.insertCell(1).innerText = c.email || "N/A";
             row.insertCell(2).innerText = c.message || "N/A";
         });
     } catch (err) {
-        console.error("Contacts Error:", err);
-        document.getElementById("status").innerText += " Contacts Error: " + err.message;
+        console.error("Fetch error:", err);
+        if (status) status.innerText = "Server not running (Check F12)";
     }
 }
 
 async function loadDonations() {
     try {
-        // FIXED: Removed http://127.0.0.1:5000. 
-        // This was the main reason for your 404/Connection errors!
-        const res = await fetch("/api/admin/donations"); 
-        if (!res.ok) throw new Error("Donations fetch failed with status " + res.status);
+        // FIXED: No more 127.0.0.1. Using relative path.
+        const res = await fetch("/api/admin/donations");
+        if (!res.ok) return; // Silent fail if donations don't exist yet
 
         const data = await res.json();
-        const tbody = document.getElementById("donationsBody");
+        const table = document.getElementById("donationsTable");
 
         data.forEach(d => {
-            const row = tbody.insertRow();
+            const row = table.insertRow();
             row.insertCell(0).innerText = d.name || "N/A";
             row.insertCell(1).innerText = d.email || "N/A";
             row.insertCell(2).innerText = d.amount || "0";
             row.insertCell(3).innerText = d.message || "N/A";
         });
     } catch (err) {
-        console.error("Donations Error:", err);
-        // We don't want to crash the whole page if donations are empty
-        console.log("Donation list might be empty or route missing.");
+        console.log("Donations not found or empty.");
     }
 }
 
-// Run both
+// Start the loading process
 loadContacts();
 loadDonations();
-</script>
-
-</body>
-</html>
