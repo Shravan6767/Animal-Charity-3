@@ -1,16 +1,15 @@
 import os 
 from pymongo import MongoClient
 
-# This line looks for the 'MONGO_URI' key you created in the Render dashboard
-# If it can't find it, it will stay empty (None)
+# This pulls the real string (with your real password) from Render's settings
 mongo_uri = os.environ.get("MONGO_URI")
 
-# connect to MongoDB using the variable
+# Connect using the variable, not a hardcoded string
 client = MongoClient(mongo_uri)
 
-# create database
+# Create database
 db = client["animal_charity"]
 
-# collections
+# Collections
 contacts_collection = db["contacts"]
 donations_collection = db["donations"]
