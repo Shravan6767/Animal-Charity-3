@@ -53,7 +53,7 @@ row.insertCell(2).innerText=c.message;
 
 async function loadDonations(){
 
-const res = await fetch("http://127.0.0.1:5000/api/admin/donations");
+const res = await fetch("/api/admin/donations");
 const data = await res.json();
 
 const table = document.getElementById("donationsTable");
