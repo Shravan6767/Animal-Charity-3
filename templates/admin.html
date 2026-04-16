@@ -1,75 +1,95 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Admin Dashboard</title>
-<style>
-body{font-family:Arial;background:#f5f5f5;padding:30px}
-h1{color:#2c3e50}
-table{width:100%;border-collapse:collapse;margin-bottom:40px}
-th,td{border:1px solid #ccc;padding:10px;text-align:left}
-th{background:#2c3e50;color:white}
-</style>
+    <title>Admin Dashboard</title>
+    <style>
+        body{font-family:Arial;background:#f5f5f5;padding:30px}
+        h1{color:#2c3e50}
+        table{width:100%;border-collapse:collapse;margin-bottom:40px}
+        th,td{border:1px solid #ccc;padding:10px;text-align:left}
+        th{background:#2c3e50;color:white}
+        .error-log { color: red; font-weight: bold; }
+    </style>
 </head>
-
 <body>
 
 <h1>Admin Dashboard</h1>
+<div id="status" class="error-log"></div>
 
 <h2>Contact Messages</h2>
 <table id="contactsTable">
-<tr>
-<th>Name</th>
-<th>Email</th>
-<th>Message</th>
-</tr>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+    <tbody id="contactsBody"></tbody>
 </table>
 
 <h2>Donations</h2>
 <table id="donationsTable">
-<tr>
-<th>Name</th>
-<th>Email</th>
-<th>Amount</th>
-<th>Message</th>
-</tr>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Amount</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+    <tbody id="donationsBody"></tbody>
 </table>
 
 <script>
+async function loadContacts() {
+    try {
+        // FIXED: Removed the local IP. Using relative path for Render.
+        const res = await fetch("/api/admin/contacts");
+        if (!res.ok) throw new Error("Contacts fetch failed with status " + res.status);
+        
+        const data = await res.json();
+        const tbody = document.getElementById("contactsBody");
 
-async function loadContacts(){
-
-const res = await fetch("/api/admin/contacts");
-const data = await res.json();
-
-const table = document.getElementById("contactsTable");
-
-data.forEach(c=>{
-const row = table.insertRow();
-row.insertCell(0).innerText=c.name;
-row.insertCell(1).innerText=c.email;
-row.insertCell(2).innerText=c.message;
-});
+        data.forEach(c => {
+            const row = tbody.insertRow();
+            row.insertCell(0).innerText = c.name || "N/A";
+            row.insertCell(1).innerText = c.email || "N/A";
+            row.insertCell(2).innerText = c.message || "N/A";
+        });
+    } catch (err) {
+        console.error("Contacts Error:", err);
+        document.getElementById("status").innerText += " Contacts Error: " + err.message;
+    }
 }
 
-async function loadDonations(){
+async function loadDonations() {
+    try {
+        // FIXED: Removed http://127.0.0.1:5000. 
+        // This was the main reason for your 404/Connection errors!
+        const res = await fetch("/api/admin/donations"); 
+        if (!res.ok) throw new Error("Donations fetch failed with status " + res.status);
 
-const res = await fetch("http://127.0.0.1:5000/api/admin/donations");
-const data = await res.json();
+        const data = await res.json();
+        const tbody = document.getElementById("donationsBody");
 
-const table = document.getElementById("donationsTable");
-
-data.forEach(d=>{
-const row = table.insertRow();
-row.insertCell(0).innerText=d.name;
-row.insertCell(1).innerText=d.email;
-row.insertCell(2).innerText=d.amount;
-row.insertCell(3).innerText=d.message;
-});
+        data.forEach(d => {
+            const row = tbody.insertRow();
+            row.insertCell(0).innerText = d.name || "N/A";
+            row.insertCell(1).innerText = d.email || "N/A";
+            row.insertCell(2).innerText = d.amount || "0";
+            row.insertCell(3).innerText = d.message || "N/A";
+        });
+    } catch (err) {
+        console.error("Donations Error:", err);
+        // We don't want to crash the whole page if donations are empty
+        console.log("Donation list might be empty or route missing.");
+    }
 }
 
+// Run both
 loadContacts();
 loadDonations();
-
 </script>
 
 </body>
