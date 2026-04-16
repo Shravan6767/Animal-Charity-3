@@ -71,17 +71,9 @@ def login():
 # Admin route to get contacts
 @app.route('/api/admin/contacts', methods=['GET', 'POST'])
 def get_admin_contacts():
-    try:
-        contacts = list(contacts_collection.find())
-        for contact in contacts:
-            contact["_id"] = str(contact["_id"])
-        
-        # Ensure you are using jsonify
-        return jsonify(contacts) 
-    except Exception as e:
-        print(f"Error: {e}")
-        return jsonify([]), 500 # Return empty list on error
-
+    # We are bypassing the database for one minute to test the connection
+    mock_data = [{"name": "System Check", "email": "success@test.com", "message": "The connection is alive!"}]
+    return jsonify(mock_data)
 
 # Admin route to get donations
 @app.route('/api/admin/donations', methods=['GET'])
