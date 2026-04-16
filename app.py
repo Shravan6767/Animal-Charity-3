@@ -69,12 +69,11 @@ def login():
 
 
 # Admin route to get contacts
-@app.route('/api/admin/contacts', methods=['GET', 'POST'])
-def get_admin_contacts():
-    # We are bypassing the database for one minute to test the connection
-    mock_data = [{"name": "System Check", "email": "success@test.com", "message": "The connection is alive!"}]
-    return jsonify(mock_data)
+@app.route('/api/admin/contacts', methods=['GET'])
+def get_contacts():
 
+    contacts = list(contacts_collection.find({}, {"_id": 0}))
+    return jsonify(contacts)
 # Admin route to get donations
 @app.route('/api/admin/donations', methods=['GET'])
 def get_donations():
