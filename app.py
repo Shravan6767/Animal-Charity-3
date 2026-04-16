@@ -69,9 +69,9 @@ def login():
 
 
 # Admin route to get contacts
-@app.route('/api/admin/contacts', methods=['GET'])
+@app.route('/api/admin/contacts', methods=['GET', 'POST'])
 def get_contacts():
-
+    
     contacts = list(contacts_collection.find({}, {"_id": 0}))
     return jsonify(contacts)
 
